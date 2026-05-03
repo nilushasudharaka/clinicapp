@@ -1,0 +1,150 @@
+================================================================
+  SE2020 – Web & Mobile Development
+  API ENDPOINT TABLE
+  Project: MediCare – Clinic Appointment Management System
+================================================================
+
+Base URL (Local)  : http://localhost:5000/api
+Base URL (Remote) : https://your-api-link  [update after deployment]
+
+Auth Header (protected routes):
+  Authorization: Bearer <accessToken>
+
+Role abbreviations:
+  P = Patient | D = Doctor | A = Admin | PUB = Public (no auth)
+
+================================================================
+  AUTH ROUTES  –  /api/auth
+================================================================
+
+Method  Endpoint              Role   Description
+------  --------------------  -----  --------------------------
+POST    /auth/register         PUB    Register new patient account
+POST    /auth/login            PUB    Login (returns JWT tokens)
+POST    /auth/refresh          PUB    Refresh access token
+GET     /auth/me               P/D/A  Get logged-in user profile
+
+
+================================================================
+  DOCTOR ROUTES  –  /api/doctors
+================================================================
+
+Method  Endpoint              Role   Description
+------  --------------------  -----  --------------------------
+GET     /doctors               PUB    Get all active doctors
+GET     /doctors/:id           PUB    Get single doctor by ID
+POST    /doctors               A      Add a new doctor
+PUT     /doctors/:id           A      Update doctor details
+DELETE  /doctors/:id           A      Deactivate doctor
+
+
+================================================================
+  APPOINTMENT ROUTES  –  /api/appointments
+================================================================
+
+Method  Endpoint                           Role  Description
+------  ---------------------------------  ----  ---------------------------
+POST    /appointments                       P     Book a new appointment
+GET     /appointments                       A     Get all appointments
+GET     /appointments/my-appointments/patient  P  Get patient's appointments
+GET     /appointments/doctor/:doctorId      D     Get doctor's appointments
+GET     /appointments/:id                   P/D/A Get appointment by ID
+PUT     /appointments/:id                   P/D/A Update appointment (status,
+                                                  reschedule, cancel)
+DELETE  /appointments/:id                   A     Delete appointment
+
+
+================================================================
+  BILLING ROUTES  –  /api/billing
+================================================================
+
+Method  Endpoint                          Role  Description
+------  --------------------------------  ----  --------------------------
+POST    /billing                           A     Create invoice for appointment
+GET     /billing                           A     Get all invoices
+GET     /billing/my-billing                P     Get patient's own invoices
+GET     /billing/by-appointment/:aptId     P/A   Get bill by appointment ID
+GET     /billing/:id                       P/A   Get invoice by billing ID
+PUT     /billing/:id/status                P/A   Update payment status (Paid)
+DELETE  /billing/:id                       A     Soft-delete invoice
+
+
+================================================================
+  PRESCRIPTION ROUTES  –  /api/prescriptions
+================================================================
+
+Method  Endpoint                          Role  Description
+------  --------------------------------  ----  --------------------------
+POST    /prescriptions                     D     Create prescription
+GET     /prescriptions                     A     Get all prescriptions
+GET     /prescriptions/my-prescriptions    P     Get patient's prescriptions
+GET     /prescriptions/:appointmentId      P/D/A Get prescription by appointment
+DELETE  /prescriptions/:id                 A/D   Deactivate prescription
+
+
+================================================================
+  PATIENT ROUTES  –  /api/patients
+================================================================
+
+Method  Endpoint                  Role  Description
+------  ------------------------  ----  ----------------------------
+GET     /patients                  A     Get all patients
+GET     /patients/:id              A/P   Get patient profile
+PUT     /patients/:id              A/P   Update patient profile
+DELETE  /patients/:id              A     Deactivate patient account
+
+
+================================================================
+  REQUEST / RESPONSE EXAMPLES
+================================================================
+
+POST /api/auth/login
+  Request Body:
+    { "email": "patient@example.com", "password": "pass123" }
+  Response:
+    {
+      "accessToken": "eyJ...",
+      "refreshToken": "eyJ...",
+      "user": { "_id": "...", "name": "...", "role": "patient" }
+    }
+
+POST /api/appointments
+  Request Body:
+    {
+      "doctorId": "...",
+      "date": "2026-05-10",
+      "time": "10:00 AM",
+      "patientName": "John Doe",
+      "patientPhone": "0771234567",
+      "description": "Fever and headache"
+    }
+
+POST /api/billing
+  Request Body:
+    {
+      "appointmentId": "...",
+      "patientId":     "...",
+      "doctorId":      "...",
+      "consultationFee": 1500,
+      "medicineFee":     500,
+      "otherCharges":    200
+    }
+
+
+================================================================
+  HTTP STATUS CODES USED
+================================================================
+
+200 OK           – Successful GET / PUT
+201 Created      – Successful POST
+400 Bad Request  – Validation error / missing fields
+401 Unauthorized – Missing or invalid token
+403 Forbidden    – Insufficient role permissions
+404 Not Found    – Resource not found
+500 Server Error – Unexpected server error
+
+
+================================================================
+  Document prepared by: Group [XX] – SE2020
+  Institution: Sri Lanka Institute of Information Technology
+================================================================
