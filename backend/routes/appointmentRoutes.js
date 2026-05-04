@@ -14,6 +14,12 @@ const {
   rejectReschedule,
 } = require('../controllers/appointmentController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
+const {
+  createAppointmentRules,
+  updateStatusRules,
+  rescheduleRules,
+} = require('../middleware/validators/appointmentValidators');
 
 const router = express.Router();
 
@@ -36,13 +42,13 @@ router.get('/', getAppointments);
 router.get('/:id', getAppointmentById);
 
 // Patient books an appointment
-router.post('/', authorize('patient'), createAppointment);
+router.post('/', authorize('patient'), createAppointmentRules, validate, createAppointment);
 
 // Doctor/Admin update status
-router.put('/:id/status', authorize('doctor', 'admin'), updateAppointmentStatus);
+router.put('/:id/status', authorize('doctor', 'admin'), updateStatusRules, validate, updateAppointmentStatus);
 
 // Doctor: Request a reschedule for a confirmed appointment
-router.post('/:id/request-reschedule', authorize('doctor'), requestReschedule);
+router.post('/:id/request-reschedule', authorize('doctor'), rescheduleRules, validate, requestReschedule);
 
 // Admin: Approve or Reject a reschedule request
 router.post('/:id/approve-reschedule', authorize('admin'), approveReschedule);

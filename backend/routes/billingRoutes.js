@@ -9,6 +9,8 @@ const {
   deleteInvoice,
 } = require('../controllers/billingController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
+const { createBillingRules, updateStatusRules } = require('../middleware/validators/billingValidators');
 
 const router = express.Router();
 
@@ -17,9 +19,9 @@ router.get('/my-billing', protect, authorize('patient'), getMyBilling);
 router.get('/by-appointment/:appointmentId', protect, getBillingByAppointment);
 
 // Admin routes (static paths MUST come before parameterized /:id)
-router.post('/', protect, authorize('admin'), createInvoice);
+router.post('/', protect, authorize('admin'), createBillingRules, validate, createInvoice);
 router.get('/', protect, authorize('admin'), getAllInvoices);
-router.put('/:id/status', protect, updatePaymentStatus);
+router.put('/:id/status', protect, updateStatusRules, validate, updatePaymentStatus);
 router.delete('/:id', protect, authorize('admin'), deleteInvoice);
 
 // Shared (Admin + specific Patient — access checked inside controller)

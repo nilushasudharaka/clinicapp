@@ -6,11 +6,13 @@ const {
   getAllPrescriptions
 } = require('../controllers/prescriptionController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
+const { createPrescriptionRules } = require('../middleware/validators/prescriptionValidators');
 
 const router = express.Router();
 
-// Doctor creates prescription
-router.post('/', protect, authorize('doctor'), createPrescription);
+// Doctor creates prescription (with validation)
+router.post('/', protect, authorize('doctor'), createPrescriptionRules, validate, createPrescription);
 
 // Patients view their own prescriptions (MUST be before generic GET /)
 router.get('/my-prescriptions', protect, authorize('patient'), getMyPrescriptions);
