@@ -9,6 +9,7 @@ const {
   updateDoctor,
   deleteDoctor,
   getAdminStats,
+  updateMyStatus,
 } = require('../controllers/doctorController');
 const uploadMiddleware = require('../middleware/uploadMiddleware');
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -21,6 +22,9 @@ router.get('/admin/all', protect, authorize('admin'), getAllDoctorsAdmin);
 
 // Doctor: get own profile
 router.get('/my-profile', protect, authorize('doctor'), getMyDoctorProfile);
+
+// Doctor: update own active status
+router.put('/my-profile/status', protect, authorize('doctor'), updateMyStatus);
 
 // Public: get all active doctors
 // Admin: create doctor profile

@@ -28,6 +28,10 @@ const patientSchema = new mongoose.Schema(
       relationship: String,
       phone: String,
     },
+    profilePhoto: {
+      type: String,
+      default: null,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -25,7 +25,16 @@ exports.getAppointments = async (req, res) => {
       .sort({ date: -1 })
       .lean();
 
-    res.json(appointments);
+    // Attach patient profile data for each appointment
+    const enhancedAppointments = await Promise.all(appointments.map(async (app) => {
+      if (app.patientId) {
+        const profile = await Patient.findOne({ userId: app.patientId._id }).lean();
+        return { ...app, patientProfile: profile };
+      }
+      return app;
+    }));
+
+    res.json(enhancedAppointments);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -47,7 +56,16 @@ exports.getMyAppointmentsAsDoctor = async (req, res) => {
       .sort({ date: -1 })
       .lean();
 
-    res.json(appointments);
+    // Attach patient profile data
+    const enhancedAppointments = await Promise.all(appointments.map(async (app) => {
+      if (app.patientId) {
+        const profile = await Patient.findOne({ userId: app.patientId._id }).lean();
+        return { ...app, patientProfile: profile };
+      }
+      return app;
+    }));
+
+    res.json(enhancedAppointments);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -81,6 +99,12 @@ exports.getAppointmentById = async (req, res) => {
 
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Attach patient profile data
+    if (appointment.patientId) {
+      const profile = await Patient.findOne({ userId: appointment.patientId._id }).lean();
+      appointment.patientProfile = profile;
     }
 
     res.json(appointment);

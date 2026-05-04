@@ -9,12 +9,17 @@ const {
 } = require('../controllers/patientController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
+const uploadMiddleware = require('../middleware/uploadMiddleware');
+
+const validate = require('../middleware/validate');
+const { patientProfileRules } = require('../middleware/validators/patientValidators');
+
 const router = express.Router();
 
 // Patient routes
-router.post('/profile', protect, authorize('patient'), createPatientProfile);
+router.post('/profile', protect, authorize('patient'), uploadMiddleware.single('profilePhoto'), patientProfileRules, validate, createPatientProfile);
 router.get('/profile', protect, authorize('patient'), getPatientProfile);
-router.put('/profile', protect, authorize('patient'), updatePatientProfile);
+router.put('/profile', protect, authorize('patient'), uploadMiddleware.single('profilePhoto'), patientProfileRules, validate, updatePatientProfile);
 
 // Admin & Doctor routes
 router.get('/', protect, authorize('admin', 'doctor'), getAllPatients);

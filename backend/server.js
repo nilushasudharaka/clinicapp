@@ -72,6 +72,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const billingRoutes = require('./routes/billingRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorRoutes);
@@ -79,6 +80,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

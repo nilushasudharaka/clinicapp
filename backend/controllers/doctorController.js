@@ -130,6 +130,30 @@ exports.getMyDoctorProfile = async (req, res) => {
   }
 };
 
+// @desc    Update the logged-in doctor's active status
+// @route   PUT /api/doctors/my-profile/status
+// @access  Doctor
+exports.updateMyStatus = async (req, res) => {
+  try {
+    const { isActive } = req.body;
+    if (isActive === undefined) {
+      return res.status(400).json({ message: 'isActive field is required' });
+    }
+
+    const doctor = await Doctor.findOne({ userId: req.user._id });
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor profile not found' });
+    }
+
+    doctor.isActive = isActive;
+    await doctor.save();
+
+    res.json({ message: 'Status updated successfully', isActive: doctor.isActive });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // @desc    Get doctor by ID
 // @route   GET /api/doctors/:id
 // @access  Public

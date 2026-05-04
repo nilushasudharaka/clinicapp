@@ -15,7 +15,8 @@ exports.createPatientProfile = async (req, res) => {
       gender: req.body.gender,
       bloodGroup: req.body.bloodGroup || '',
       address: req.body.address || '',
-      emergencyContact: req.body.emergencyContact || {},
+      emergencyContact: req.body.emergencyContact ? JSON.parse(req.body.emergencyContact) : {},
+      profilePhoto: req.file ? req.file.path.replace(/\\/g, '/') : null,
       isActive: true,
     });
 
@@ -47,7 +48,10 @@ exports.updatePatientProfile = async (req, res) => {
     const { bloodGroup, address, emergencyContact } = req.body;
     if (bloodGroup) patient.bloodGroup = bloodGroup;
     if (address) patient.address = address;
-    if (emergencyContact) patient.emergencyContact = emergencyContact;
+    if (emergencyContact) patient.emergencyContact = JSON.parse(emergencyContact);
+    if (req.file) {
+      patient.profilePhoto = req.file.path.replace(/\\/g, '/');
+    }
 
     await patient.save();
     res.json(patient);
