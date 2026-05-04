@@ -1,6 +1,7 @@
 const Doctor = require('../models/Doctor');
 const Appointment = require('../models/Appointment');
 const Patient = require('../models/Patient');
+const Review = require('../models/Review');
 
 // @desc    Create new doctor profile
 // @route   POST /api/doctors
@@ -109,7 +110,16 @@ exports.getAllDoctorsAdmin = async (req, res) => {
 exports.getAllDoctors = async (req, res) => {
   try {
     const doctors = await Doctor.find({ isActive: true }).lean();
-    res.json(doctors);
+    
+    const enrichedDoctors = await Promise.all(doctors.map(async (doc) => {
+      const reviews = await Review.find({ doctorId: doc._id });
+      const avgRating = reviews.length > 0 
+        ? (reviews.reduce((acc, r) => acc + r.overallRating, 0) / reviews.length).toFixed(1)
+        : "5.0"; 
+      return { ...doc, averageRating: avgRating, totalReviews: reviews.length };
+    }));
+
+    res.json(enrichedDoctors);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -163,7 +173,13 @@ exports.getDoctorById = async (req, res) => {
     if (!doctor) {
       return res.status(404).json({ message: 'Doctor not found' });
     }
-    res.json(doctor);
+
+    const reviews = await Review.find({ doctorId: doctor._id });
+    const avgRating = reviews.length > 0 
+      ? (reviews.reduce((acc, r) => acc + r.overallRating, 0) / reviews.length).toFixed(1)
+      : "5.0";
+
+    res.json({ ...doctor, averageRating: avgRating, totalReviews: reviews.length });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
